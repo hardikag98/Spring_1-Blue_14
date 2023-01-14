@@ -1,0 +1,128 @@
+---
+title: "Financial Analytics Homework"
+author: "Jane Williford"
+date: "2023-01-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Commercial Banking Corporation (hereafter the “Bank”), acting by and through its department of
+Revolving Lines of Credit is seeking proposals for banking services. The scope of services includes the
+following:
+• Creation of a scorecard, to be used for evaluating all retail credit applications (credit facilities,
+revolving lines of credit, etc.)
+• Creation of a distribution to associate score buckets (preferably deciles) with default rate.
+• Regulatory compliance (FDIC) requires the usage of reject inference. The reject inference
+technique is on the discretion of the Responder but it should be clearly stated in the report.
+• The Bank’s analysts suggest a training / validation mix of 70% / 30%; the Bank is open to other
+proposals as long as they are clearly stated and supported.
+• General guidelines for final cutoff points: Respondents to this RFP can define either:
+o Single cutoff points (e.g. Reject if Score ≤ 400; Accept if Score ≥ 401) or
+o Cutoff ranges (e.g. Reject if Score ≤ 400; Accept if Score ≥ 450; Further evaluation for
+scores within 401 to 449)
+• Cutoff points should be identified with the purpose of:
+o Maintaining the existing acceptance rate (75%) while minimizing event (default) rates
+and/or
+o Maintaining the current event rate (3.23%) while maximizing the acceptance rate
+o Maximizing the profitability of the department, considering the following:
+§ Expected revenue of accepted good customers: $2,000
+§ Expected cost of accepted bad customers: $52,000
+• The Bank assigns a score of 500 to applicants with odds-ratio 20:1.
+• Doubling the odds is associated with a change of 50 points in the scorecard.
+
+```{r}
+# Needed Libraries for Analysis #
+
+library(here)
+library(conflicted)
+library(gmodels)
+library(vcd)
+library(smbinning)
+library(dplyr)
+library(stringr)
+library(shades)
+library(latticeExtra)
+library(plotly)
+
+```
+
+
+```{r}
+# Load Needed Data Sets + Run Checks#
+
+here()
+
+accepted <- read.csv(file = here("Homework1_FA","accepted_customers.csv"), header = TRUE)
+# contains 3,000 observations and 24 variables 
+
+table(accepted$GB)
+#The sample is balanced, consisting of 1,500 “good”-0 and 1,500 “bad”-1 accepted applicants
+# “Bad” has been defined as having been 90 days past due once. 
+# Everyone not “bad” is “good”, so there are no indeterminate cases
+
+
+# The accepted data set has been over-sampled for us because the event of defaulting is only 3.23% in the population.
+table(accepted$GB,accepted$X_freq_)
+# all goods (0s) have a weight of 30 and all bads (1s) have a weight of 1. It make sense to have a higher weight for the goods since the bads are over sampled.
+
+# DONE: checked on if the weights are assigned correctly via the weight variable (X_freq_)
+# Weight of goods= (sample proportion of bads * population proportion of goods)/ (sample proportion of goods* population proportion of bads)
+weightcheck <- (0.5*(1-0.0323))/(0.5*0.0323)
+# this gives us 29.96 which is around 30, so the weights are correct here
+
+
+rejected <- read.csv(file = here("Homework1_FA","rejected_customers.csv"), header = TRUE)
+# 1,500 applicants who were ultimately rejected for a loan with 22 variables on them (all same vars but no target GB and no weighting var)
+
+
+#We have the same information on these applicants except for the target variable of whether they defaulted since they were never given a loan. These individuals are still key to our analysis. 
+#Sampling bias occurs when we only use people who were given loans to make decisions on individuals who apply for loans. In order to correct for this bias, we perform reject inference on the individuals who applied, but were not given loans.
+#We will deal with this data set near the end of our credit scoring model process.
+```
+
+Step 1) Selecting predictor variables to work with
+
+```{r}
+# Subset to predictor variables that make sense business wise (based on common sense/outside research) + seem like they are ethical (for example excluding nationality)
+
+
+# within the subset of variables that make sense business wise, perform variable clustering to remove highly dependent variables
+# Impute missing values before using ClustOfVar package for this (notes in the data mining coursework)
+
+```
+
+Step 2) Data cleaning
+```{r}
+# confirm that there are no duplicates
+
+
+# check for outliars (they will be accounted for in var grouping but good to be aware of regardless in case this is a data entry error)
+
+```
+
+Step 3) Variable Grouping - bin continuous predictor variables to maximize predictive power
+```{r}
+# Use CITs to find cutoffs
+
+
+
+# Update binning cutoffs to make sense in terms of business logic (rounding)
+
+```
+
+Step 3.5) Examine key assessment metrics and see if the bins are good + see if there are any variables that don't have good predictive power after binning and remove these
+
+```{r}
+# calculate WOE for each variable that we bin looking for big differences in WOE btw bins + if the increase is monotonic (or the pattern makes sense in general)
+
+# Check for quasi complete separation
+
+
+# calculate Information Value (IV) for each variable - if any var has IV less than 0.1 then drop the variable
+
+
+```
+
