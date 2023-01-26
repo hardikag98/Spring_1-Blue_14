@@ -25,6 +25,7 @@ accepts$NAT <- as.factor(accepts$NAT)
 accepts$PRODUCT <- as.factor(accepts$PRODUCT)
 accepts$PROF <- as.factor(accepts$PROF)
 accepts$REG <- as.factor(accepts$REG)
+
 accepts$TEL <- as.factor(accepts$TEL)
 
 # binary variables into factors
@@ -249,19 +250,181 @@ colini <- (ncol(rejects_scored)-nvar + 1)
 colend <- ncol(rejects_scored)
 rejects_scored$Score <- rowSums(rejects_scored[, colini:colend])
 
-# Reject Inference - Fuzzy Augmentation #
+# Reject Inference - Hard Cut-off #
 rejects_scored$pred <- predict(initial_score, newdata=rejects_scored, type='response')
+rejects$GB <- as.numeric(rejects_scored$pred > 0.0617) # need to change this
+#rejects$good <- abs(rejects$bad - 1)
 
-rejects_g <- rejects
-rejects_b <- rejects
+pop_g <- 22045
+pop_b <- 1196
 
-rejects_g$bad <- 0
-rejects_g$weight_ar <- (1-rejects_scored$pred)*weight_rg
-rejects_g$good <- 1
+sam_g <- 4641
+sam_b <- 1196
 
-rejects_b$bad <- 1
-rejects_b$weight_ar <- (rejects_scored$pred)*weight_rb
-rejects_b$good <- 0
+pop_sam_gb_ratio <- (pop_g/pop_b)/(sam_g/sam_b)
+
+pop_a <- 0.7
+pop_r <- 0.3
+
+sam_a <- 5837
+sam_r <- 4233
+
+pop_sam_ar_ratio <- (pop_a/pop_r)/(sam_a/sam_r)
+
+weight_rb <- 1
+weight_rg <- pop_sam_gb_ratio
+
+weight_ab <- pop_sam_ar_ratio
+weight_ag <- pop_sam_ar_ratio*pop_sam_gb_ratio
 
 accepts$weight_ar <- ifelse(accepts$GB == 1, weight_ab, weight_ag)
-comb_fuzz <- rbind(accepts[, !(names(accepts) == 'weight')], rejects_g, rejects_b)
+rejects$weight_ar <- ifelse(rejects$GB == 1, weight_rb, weight_rg)
+accepts = subset(accepts, select = -c(REG, X_freq_) )
+
+comb_hard <- rbind(accepts[, !(names(accepts) == 'weight')], rejects) # New Combined Data Set #
+
+# Build Final Scorecard Model - Basically Repeating ALL Steps with New Data #
+comb <- comb_hard # Select which data set you want to use from above techniques #
+
+set.seed(12345)
+train_id <- sample(seq_len(nrow(comb)), size = floor(0.7*nrow(comb)))
+
+train_comb <- comb[train_id, ]
+test_comb <- comb[-train_id, ]
+
+iv_summary <- smbinning.sumiv(df = train_comb, y = "GB")
+
+smbinning.sumiv.plot(iv_summary)
+iv_summary
+
+num_names <-  names(train[c("AGE", "INCOME", "TMJOB1", "PERS_H")]) # Gathering the names of numeric variables in data #
+
+
+result_all_sig <- list() # Creating empty list to store all results #
+
+for(i in 1:length(num_names)){
+  check_res <- smbinning(df = train, y = "GB", x = num_names[i])
+  
+  if(check_res$iv < 0.1 | is.na(check_res$iv)) {
+    next
+  }
+  else {
+    result_all_sig[[num_names[i]]] <- check_res
+  }
+}
+
+for(i in 1:length(result_all_sig)) {
+  train_comb <- smbinning.gen(df = train_comb, ivout = result_all_sig[[i]], chrname = paste(result_all_sig[[i]]$x, "_bin", sep = ""))
+}
+
+for (j in 1:length(result_all_sig)) {
+  for (i in 1:nrow(train_comb)) {
+    bin_name <- paste(result_all_sig[[j]]$x, "_bin", sep = "")
+    bin <- substr(train_comb[[bin_name]][i], 2, 2)
+    
+    woe_name <- paste(result_all_sig[[j]]$x, "_WOE", sep = "")
+    
+    if(bin == 0) {
+      bin <- dim(result_all_sig[[j]]$ivtable)[1] - 1
+      train_comb[[woe_name]][i] <- result_all_sig[[j]]$ivtable[bin, "WoE"]
+    } else {
+      train_comb[[woe_name]][i] <- result_all_sig[[j]]$ivtable[bin, "WoE"]
+    }
+  }
+}
+
+final_score <- glm(data = train_comb, GB ~ AGE_WOE +
+                     INCOME_WOE +
+                     TMJOB1_WOE +
+                     PERS_H_WOE, weights = train_comb$weight_ar, family = "binomial")
+
+summary(final_score)
+
+# more metrics
+train_comb$pred <- final_score$fitted.values
+
+smbinning.metrics(dataset = train_comb, prediction = "pred", actualclass = "GB", report = 1)
+smbinning.metrics(dataset = train_comb, prediction = "pred", actualclass = "GB", report = 0, plot = "ks")
+smbinning.metrics(dataset = train_comb, prediction = "pred", actualclass = "GB", report = 0, plot = "auc")
+
+for(i in 1:length(result_all_sig)) {
+  test_comb <- smbinning.gen(df = test_comb, ivout = result_all_sig[[i]], chrname = paste(result_all_sig[[i]]$x, "_bin", sep = ""))
+}
+
+for (j in 1:length(result_all_sig)) {
+  for (i in 1:nrow(test_comb)) {
+    bin_name <- paste(result_all_sig[[j]]$x, "_bin", sep = "")
+    bin <- substr(test_comb[[bin_name]][i], 2, 2)
+    
+    woe_name <- paste(result_all_sig[[j]]$x, "_WOE", sep = "")
+    
+    if(bin == 0) {
+      bin <- dim(result_all_sig[[j]]$ivtable)[1] - 1
+      test_comb[[woe_name]][i] <- result_all_sig[[j]]$ivtable[bin, "WoE"]
+    } else {
+      test_comb[[woe_name]][i] <- result_all_sig[[j]]$ivtable[bin, "WoE"]
+    }
+  }
+}
+
+test_comb$pred <- predict(final_score, newdata=test_comb, type='response')
+
+smbinning.metrics(dataset = test_comb, prediction = "pred", actualclass = "GB", report = 1)
+smbinning.metrics(dataset = test_comb, prediction = "pred", actualclass = "GB", report = 0, plot = "ks")
+smbinning.metrics(dataset = test_comb, prediction = "pred", actualclass = "GB", report = 0, plot = "auc")
+
+pdo <- 50
+score <- 500
+odds <- 20
+fact <- pdo/log(2)
+os <- score - fact*log(odds)
+var_names <- names(final_score$coefficients[-1])
+
+for(i in var_names) {
+  beta <- final_score$coefficients[i]
+  beta0 <- final_score$coefficients["(Intercept)"]
+  nvar <- length(var_names)
+  WOE_var <- train_comb[[i]]
+  points_name <- paste(str_sub(i, end = -4), "points", sep="")
+  
+  train_comb[[points_name]] <- -(WOE_var*(beta) + (beta0/nvar))*fact + os/nvar
+}
+
+colini <- (ncol(train_comb)-nvar + 1)
+colend <- ncol(train_comb)
+train_comb$Score <- rowSums(train_comb[, colini:colend])
+
+hist(train_comb$Score, breaks = 50, main = "Distribution of Scores", xlab = "Score")
+
+for(i in var_names) {
+  beta <- final_score$coefficients[i]
+  beta0 <- final_score$coefficients["(Intercept)"]
+  nvar <- length(var_names)
+  WOE_var <- test_comb[[i]]
+  points_name <- paste(str_sub(i, end = -4), "points", sep="")
+  
+  test_comb[[points_name]] <- -(WOE_var*(beta) + (beta0/nvar))*fact + os/nvar
+}
+
+colini <- (ncol(test_comb)-nvar + 1)
+colend <- ncol(test_comb)
+test_comb$Score <- rowSums(test_comb[, colini:colend])
+
+hist(test_comb$Score, breaks = 50, main = "Distribution of Test Scores", xlab = "Score")
+
+accepts_scored_comb <- rbind(train_comb, test_comb)
+hist(accepts_scored_comb$Score, breaks = 50, xlim = c(450,650), main = "Distribution of Scores", xlab = "Score")
+
+cutpoints <- quantile(accepts_scored_comb$Score, probs = seq(0,1,0.10))
+accepts_scored_comb$Score.QBin <- cut(accepts_scored_comb$Score, breaks=cutpoints, include.lowest=TRUE)
+Default.QBin.pop <- round(table(accepts_scored_comb$Score.QBin, accepts_scored_comb$bad)[,2]/(table(accepts_scored_comb$Score.QBin, accepts_scored_comb$bad)[,2] + table(accepts_scored_comb$Score.QBin, accepts_scored_comb$bad)[,1]*4.75)*100,2)
+
+print(Default.QBin.pop)
+
+barplot(Default.QBin.pop, 
+        main = "Default Decile Plot", 
+        xlab = "Deciles of Scorecard",
+        ylab = "Default Rate (%)", ylim = c(0,20),
+        col = saturation(heat.colors, scalefac(0.8))(10))
+abline(h = 5, lwd = 2, lty = "dashed")
+text(11.5, 5, "Current = 5.00%")
