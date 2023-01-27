@@ -646,7 +646,7 @@ cutpoints <- quantile(accepted_scored_comb$Score,
 accepted_scored_comb$Score.QBin <-cut(accepted_scored_comb$Score,
                       breaks=cutpoints, include.lowest=TRUE)
 
-Default.QBin.pop <- round(table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,2]/(table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,2] + table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,1]*4.75)*100,2)
+Default.QBin.pop <- round(table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,2]/(table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,2] + table(accepted_scored_comb$Score.QBin, accepted_scored_comb$GB)[,1]*30)*100,2)
 
 cutpoints
 
@@ -656,7 +656,7 @@ print(Default.QBin.pop)
 barplot(Default.QBin.pop, 
         main = "Default Decile Plot", 
         xlab = "Deciles of Scorecard",
-        ylab = "Default Rate (%)", ylim = c(0,100),
+        ylab = "Default Rate (%)", ylim = c(0,25),
         col = saturation(heat.colors, scalefac(0.8))(10))
 abline(h = 5, lwd = 2, lty = "dashed")
 text(11.5, 5, "Current = 3.73%")
@@ -675,13 +675,13 @@ for(i in min(floor(train_comb$Score)):max(floor(train_comb$Score))){
   def[i - min(floor(train_comb$Score)) + 1] <- 
     100*sum(train_comb$GB[which(train_comb$Score >= i)]) / 
     (length(train_comb$GB[which(train_comb$Score >= i & 
-                                  train_comb$GB == 1)]) + 4.75*length(train_comb$GB[which(train_comb$Score >= i &                                                 train_comb$GB == 0)]))
+                                  train_comb$GB == 1)]) + 30*length(train_comb$GB[which(train_comb$Score >= i &                                                 train_comb$GB == 0)]))
   
-  acc[i - min(floor(train_comb$Score)) + 1] <- 100*(length(train_comb$GB[which(train_comb$Score >= i & train_comb$GB == 1)]) + 4.75*length(train_comb$GB[which(train_comb$Score >= i & train_comb$GB == 0)]))/(length(train_comb$GB[which(train_comb$GB == 1)]) + 4.75*length(train_comb$GB[which(train_comb$GB == 0)]))
+  acc[i - min(floor(train_comb$Score)) + 1] <- 100*(length(train_comb$GB[which(train_comb$Score >= i & train_comb$GB == 1)]) + 30*length(train_comb$GB[which(train_comb$Score >= i & train_comb$GB == 0)]))/(length(train_comb$GB[which(train_comb$GB == 1)]) + 30*length(train_comb$GB[which(train_comb$GB == 0)]))
   
   prof[i - min(floor(train_comb$Score)) + 1] <- length(train_comb$GB[which(train_comb$Score >= i &
                            train_comb$GB == 1)])*(-cost) +
-    4.75*length(train_comb$GB[which(train_comb$Score >= i &
+    30*length(train_comb$GB[which(train_comb$Score >= i &
                                    train_comb$GB == 0)])*profit
   
 }
