@@ -45,4 +45,4 @@ for i in Symbols:
         None
 
 # save dataframs as csv to reduce pull request traffic
-stock_final.to_csv("stocks_final.csv", index=False)
+stock_final.to_csv("stocks_final.csv", index=True)
