@@ -40,7 +40,7 @@ hist(est_change, breaks=50, main='KDE of Annual Changes', xlab='Annual Change')
 ########## 2006 to 2012, KDF, test for normality #########################################################################
 
 # simulate 6 years into the future, 2006 - 2012
-n = 10 #number of simulations to run parameter
+n = 10000 #number of simulations to run parameter
 P_07 <- rep() # vector to put results in
 P_08 <- rep()
 P_09 <- rep()
@@ -59,9 +59,9 @@ P_21 <- rep()
 P_22 <- rep()
 P_23 <- rep()
 
-
+set.seed(123)
 for(i in 1:n) {
-  P0 <- last(df_sub$change_avg) # use the last annual change from 2006 as the base
+  P0 <- last(df_sub$cost_avg) # use the last annual change from 2006 as the base
   r <- rkde(fhat=kde(df_sub$change_avg, h=change_density$bw), n=1) # 1 value from the kernel
   P7 <- P0*(1 + r) # multiply by change
   P_07 <- append(P_07, P7)
@@ -140,7 +140,7 @@ for(i in 1:n) {
 xbar = mean(df_sub$change_avg)
 std_dev = sd(df_sub$change_avg)
 # simulate 6 years into the future, 2006 - 2012
-n = 10 #number of simulations to run parameter
+n = 10000 #number of simulations to run parameter
 P_07_n <- rep() # vector to put results in
 P_08_n <- rep()
 P_09_n <- rep()
@@ -159,8 +159,9 @@ P_21_n <- rep()
 P_22_n <- rep()
 P_23_n <- rep()
 
+set.seed(123)
 for(i in 1:n) {
-  P0_n <- last(df_sub$change_avg) # use the last annual change from 2006 as the base
+  P0_n <- last(df_sub$cost_avg) # use the last annual change from 2006 as the base
   r <- rnorm(n=1, mean=xbar, sd=std_dev) # 1 value from the kernel
   P7_n <- P0_n*(1 + r) # multiply by change
   P_07_n <- append(P_07_n, P7_n)
