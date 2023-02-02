@@ -40,13 +40,26 @@ hist(est_change, breaks=50, main='KDE of Annual Changes', xlab='Annual Change')
 ########## 2006 to 2012, KDF, test for normality #########################################################################
 
 # simulate 6 years into the future, 2006 - 2012
-n = 100 #number of simulations to run parameter
+n = 10 #number of simulations to run parameter
 P_07 <- rep() # vector to put results in
 P_08 <- rep()
 P_09 <- rep()
 P_10 <- rep()
 P_11 <- rep()
 P_12 <- rep()
+P_13 <- rep() # vector to put results in
+P_14 <- rep()
+P_15 <- rep()
+P_16 <- rep() # vector to put results in
+P_17 <- rep()
+P_18 <- rep()
+P_19 <- rep()
+P_20 <- rep()
+P_21 <- rep()
+P_22 <- rep()
+P_23 <- rep()
+
+
 for(i in 1:n) {
   P0 <- last(df_sub$change_avg) # use the last annual change from 2006 as the base
   r <- rkde(fhat=kde(df_sub$change_avg, h=change_density$bw), n=1) # 1 value from the kernel
@@ -73,118 +86,9 @@ for(i in 1:n) {
   P12 <- P11*(1 + r) # multiply by change
   P_12 <- append(P_12, P12)
   
-}
-
-#P_0612 <- as.vector(P_0612)
-
-summary(P_07)
-summary(P_08)
-summary(P_09)
-summary(P_10)
-summary(P_11)
-summary(P_12)
-
-hist(P_07)
-hist(P_08)
-hist(P_09)
-hist(P_10)
-hist(P_11)
-hist(P_12)
-
-# test for normality
-# qqnorm(P_0612, main='Normal')
-# qqline(P_0612)
-ks.test(P_07, 'pnorm')
-ks.test(P_08, 'pnorm')
-ks.test(P_09, 'pnorm')
-ks.test(P_10, 'pnorm')
-ks.test(P_11, 'pnorm')
-ks.test(P_12, 'pnorm')
-
-# conclusion, no, the changes from 2006 to 20012 do NOT follow a normal distribution ###################################
-
-########## 2006 to 2012, Normality assumption, test for normality #########################################################################
-
-xbar = mean(df_sub$change_avg)
-std_dev = sd(df_sub$change_avg)
-# simulate 6 years into the future, 2006 - 2012
-n = 100 #number of simulations to run parameter
-P_07_n <- rep() # vector to put results in
-P_08_n <- rep()
-P_09_n <- rep()
-P_10_n <- rep()
-P_11_n <- rep()
-P_12_n <- rep()
-for(i in 1:n) {
-  P0_n <- last(df_sub$change_avg) # use the last annual change from 2006 as the base
-  r <- rnorm(n=1, mean=xbar, sd=std_dev) # 1 value from the kernel
-  P7_n <- P0_n*(1 + r) # multiply by change
-  P_07_n <- append(P_07_n, P7_n)
-  
-  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
-  P8_n <- P7_n*(1 + r) # multiply by change
-  P_08_n <- append(P_08_n, P8_n)
-  
-  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
-  P9_n <- P8_n*(1 + r) # multiply by change
-  P_09_n <- append(P_09_n, P9_n)
-  
-  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
-  P10_n <- P9_n*(1 + r) # multiply by change
-  P_10_n <- append(P_10_n, P10_n)
-  
-  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
-  P11_n <- P10_n*(1 + r) # multiply by change
-  P_11_n <- append(P_11_n, P11_n)
-  
-  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
-  P12_n <- P11_n*(1 + r) # multiply by change
-  P_12_n <- append(P_12_n, P12_n)
-  
-}
-
-summary(P_07_n)
-summary(P_08_n)
-summary(P_09_n)
-summary(P_10_n)
-summary(P_11_n)
-summary(P_12_n)
-
-hist(P_07_n)
-hist(P_08_n)
-hist(P_09_n)
-hist(P_10_n)
-hist(P_11_n)
-hist(P_12_n)
-
-# test for normality
-ks.test(P_07_n, 'pnorm')
-ks.test(P_08_n, 'pnorm')
-ks.test(P_09_n, 'pnorm')
-ks.test(P_10_n, 'pnorm')
-ks.test(P_11_n, 'pnorm')
-ks.test(P_12_n, 'pnorm')
-
-# conclusion, no, the changes from 2006 to 20012 do NOT follow a normal distribution ###################################
-
-###################################################################################
-# this follows intuition because we are multiplying normal distributions together,#
-# so we shouldn't get a normal back                                               #
-# #################################################################################
-
-# 2012 to 2015, decrease on average by 9.17% per year with a maximum of 22% and minimum of 7%, triangle distrib
-# a = min, b = max, c = mode
-
-# simulate 3 years into the future, 2012 - 2015
-n = 100 #number of simulations to run parameter
-P_13 <- rep() # vector to put results in
-P_14 <- rep()
-P_15 <- rep()
-
-for(i in 1:n) {
-  P_12_mean <- mean(P_12) # use the mean annual change from 2006 as the base @@@@@ will have to connect all three
+  # 
   r <- rtriangle(n=1, a=7, b=22, c=9.17) * -.01# 1 value from the kernel
-  P13 <- P_12_mean*(1 + r) # multiply by change
+  P13 <- P12*(1 + r) # multiply by change
   P_13 <- append(P_13, P13)
   
   r <- rtriangle(n=1, a=7, b=22, c=9.17) * -.01# 1 value from the kernel
@@ -195,26 +99,9 @@ for(i in 1:n) {
   P15 <- P14*(1 + r) # multiply by change
   P_15 <- append(P_15, P15)
   
-}  
-
-# 2015 to 2022, increase on average by 5% per year with a maximum of 6% and minimum of 2%, triangle distrib
-
-# simulate 8 years into the future, 2015 - 2023
-n = 1 #number of simulations to run parameter
-P_16 <- rep() # vector to put results in
-P_17 <- rep()
-P_18 <- rep()
-P_19 <- rep()
-P_20 <- rep()
-P_21 <- rep()
-P_22 <- rep()
-P_23 <- rep()
-
-
-for(i in 1:n) {
-  P_15_mean <- mean(P_15) # use the mean annual change from 2015 as the base @@@@@ will have to connect all three
+  #
   r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
-  P16 <- P_15_mean*(1 + r) # multiply by change
+  P16 <- P15*(1 + r) # multiply by change
   P_16 <- append(P_16, P16)
   
   r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
@@ -244,4 +131,109 @@ for(i in 1:n) {
   r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
   P23 <- P22*(1 + r) # multiply by change
   P_23 <- append(P_23, P23)
-}  
+}
+
+
+
+########## 2006 to 2012, Normality assumption, test for normality #########################################################################
+
+xbar = mean(df_sub$change_avg)
+std_dev = sd(df_sub$change_avg)
+# simulate 6 years into the future, 2006 - 2012
+n = 10 #number of simulations to run parameter
+P_07_n <- rep() # vector to put results in
+P_08_n <- rep()
+P_09_n <- rep()
+P_10_n <- rep()
+P_11_n <- rep()
+P_12_n <- rep()
+P_13_n <- rep() # vector to put results in
+P_14_n <- rep()
+P_15_n <- rep()
+P_16_n <- rep() # vector to put results in
+P_17_n <- rep()
+P_18_n <- rep()
+P_19_n <- rep()
+P_20_n <- rep()
+P_21_n <- rep()
+P_22_n <- rep()
+P_23_n <- rep()
+
+for(i in 1:n) {
+  P0_n <- last(df_sub$change_avg) # use the last annual change from 2006 as the base
+  r <- rnorm(n=1, mean=xbar, sd=std_dev) # 1 value from the kernel
+  P7_n <- P0_n*(1 + r) # multiply by change
+  P_07_n <- append(P_07_n, P7_n)
+  
+  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
+  P8_n <- P7_n*(1 + r) # multiply by change
+  P_08_n <- append(P_08_n, P8_n)
+  
+  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
+  P9_n <- P8_n*(1 + r) # multiply by change
+  P_09_n <- append(P_09_n, P9_n)
+  
+  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
+  P10_n <- P9_n*(1 + r) # multiply by change
+  P_10_n <- append(P_10_n, P10_n)
+  
+  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
+  P11_n <- P10_n*(1 + r) # multiply by change
+  P_11_n <- append(P_11_n, P11_n)
+  
+  r <- rnorm(n=1, mean=xbar, sd=std_dev)  # 1 value from the kernel
+  P12_n <- P11_n*(1 + r) # multiply by change
+  P_12_n <- append(P_12_n, P12_n)
+  
+  #
+  r <- rtriangle(n=1, a=7, b=22, c=9.17) * -.01# 1 value from the kernel
+  P13_n <- P12_n*(1 + r) # multiply by change
+  P_13_n <- append(P_13_n, P13_n)
+  
+  r <- rtriangle(n=1, a=7, b=22, c=9.17) * -.01# 1 value from the kernel
+  P14_n <- P13_n*(1 + r) # multiply by change
+  P_14_n <- append(P_14_n, P14_n)
+  
+  r <- rtriangle(n=1, a=7, b=22, c=9.17) * -.01# 1 value from the kernel
+  P15_n <- P14_n*(1 + r) # multiply by change
+  P_15_n <- append(P_15_n, P15_n)
+  
+  #
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P16_n <- P15_n*(1 + r) # multiply by change
+  P_16_n <- append(P_16_n, P16_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P17_n <- P16*(1 + r) # multiply by change
+  P_17_n <- append(P_17_n, P17_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P18_n <- P17_n*(1 + r) # multiply by change
+  P_18_n <- append(P_18_n, P18_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P19_n <- P18_n*(1 + r) # multiply by change
+  P_19_n <- append(P_19_n, P19_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P20_n <- P19_n*(1 + r) # multiply by change
+  P_20_n <- append(P_20_n, P20_n)
+  
+  r <-rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P21_n <- P20_n*(1 + r) # multiply by change
+  P_21_n <- append(P_21_n, P21_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P22_n <- P21_n*(1 + r) # multiply by change
+  P_22_n <- append(P_22_n, P22_n)
+  
+  r <- rtriangle(n=1, a=2, b=6, c=5) * .01# 1 value from the kernel
+  P23_n <- P22_n*(1 + r) # multiply by change
+  P_23_n <- append(P_23_n, P23_n)
+}
+
+###############2023 Predictions#############################################################################################
+
+summary(P_23)
+
+summary(P_23_n)
