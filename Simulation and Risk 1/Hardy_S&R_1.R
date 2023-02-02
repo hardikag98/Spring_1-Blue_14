@@ -47,7 +47,7 @@ n = 5000 #number of simulations to run parameter
 xbar = mean(df_sub$change_avg)
 std_dev = sd(df_sub$change_avg)
 
-P_06 <- last(df_sub$change_avg) 
+P_06 <- last(df_sub$cost_avg) 
 
 kde_23  <- rep()
 n_23    <- rep()
