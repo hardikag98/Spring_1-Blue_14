@@ -43,6 +43,13 @@ for i in Symbols:
             stock_final = stock_final.append(stock,sort=False)
     except Exception:
         None
+        
+# data manipulation
+# create percent daily returns column
+# formula: ((open-close)/open)*100 = %return
+# using close but not sure if I should use adj close?
+
+stock_final['Percent Return'] = ((stock_final.Open-stock_final.Close)/stock_final.Open)*100
 
 # save dataframs as csv to reduce pull request traffic
 stock_final.to_csv("stocks_final.csv", index=True)
