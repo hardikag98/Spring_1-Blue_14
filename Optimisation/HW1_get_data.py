@@ -7,6 +7,8 @@ Created on Thu Feb  2 13:58:58 2023
 # code to pull financial data from 
 # https://towardsdatascience.com/downloading-historical-stock-prices-in-python-93f85f059c1f
 
+# Jane testing push/pull
+
 # libraries
 import pandas as pd
 import yfinance as yf
