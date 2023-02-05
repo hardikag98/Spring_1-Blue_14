@@ -18,6 +18,8 @@ import datetime
 start = datetime.datetime(2022,1,20) # January 20, 2022
 end = datetime.datetime(2023,1,18) # January 18, 2023
 
+# JANE QUESTION: is the end date inclusive or exclusive? opening the csv file I don't see any Jan 18 2023 dates, it looks like it goes to Jan 17 and then goes to the next stocks
+
 # list stocks to pull data
 # Ross Stores (RST), Pinduoduo (PDD), Target Hospitality (TH), 
 # Ardmore Shipping Corp (ASC), Glencore Plc (GLNCY)
@@ -50,6 +52,8 @@ for i in Symbols:
 # create percent daily returns column
 # formula: ((open-close)/open)*100 = %return
 # using close but not sure if I should use adj close?
+
+# JANE QUESTION: the instructions say to use the returns of the closing prices, should we only be using the close value from the previous day and the current day close value? Alternatively, if we can assume that open is the previous value and close is the current value, I think the formula would be : ((close-open)/open)*100 = % return
 
 stock_final['Percent Return'] = ((stock_final.Open-stock_final.Close)/stock_final.Open)*100
 
