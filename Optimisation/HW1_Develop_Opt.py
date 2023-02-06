@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 
 import math as math
 
+import statistics as statistics
+
 # %% PERFORM OPTIMIZATION
 
 
@@ -150,11 +152,48 @@ plt.locator_params(axis='both', nbins=10)
 plt.plot()
 plt.show()
 
-# Look at what the return is at the minimized risk
+# Look at what the return and proportions are at the minimized risk
 min_risk = min(risks)
 index = risks.index(min_risk)
 return_at_min = returns[index]
+prop_at_min= props[index]
 
-print(min_risk)
-print(return_at_min)
+
 # at a risk of 1.39 std (same as 1.95 var, the return is 0.185 or 18.5%)
+# proportions - [0.08535602232123765, 0.6959185629479502, 2.779216229057393e-09, 0.19758900405162302, 0.021136407899972655]
+print("minimum risk (std)=",round(min_risk,3))
+print("return value at the minimum risk",round(return_at_min,3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_min[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_min[1],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_min[2],3))
+print("Proportion of RST (Ross Stores) Stock",round(prop_at_min[3],3))
+print("Proportion of TH (Target Hospitality) Stock",round(prop_at_min[4],3))
+
+
+
+
+# Look at what the return and proportions are at a specified risk
+
+target = 2
+
+min_difference = float('inf')
+index = None
+for i, num in enumerate(risks):
+    diff = abs(num - target)
+    if diff < min_difference:
+        min_difference = diff
+        index = i
+
+risks_at_target = risks[index]
+return_at_target = returns[index]
+prop_at_target= props[index]
+
+print("target=",target)
+print("risk value closest to the target (std)=",round(risks_at_target,3))
+print("return value at the specified risk",round(return_at_target,3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_target[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
+print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
+print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
+
