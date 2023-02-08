@@ -90,9 +90,23 @@ for v in vars:
 print(m.objval)
 # 3.72
 
+# print return
+print(stock_return.dot(m.x))
+
 # print std
 print(math.sqrt(m.objval))
 # 1.93
+
+# print proportion matrix
+print(m.x)
+
+# print in easier to see way
+print("Proportion of RST (Ross Stores) Stock",round(m.x[3],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(m.x[2],3))
+print("Proportion of TH (Target Hospitality) Stock",round(m.x[4],3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(m.x[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(m.x[1],3))
+
 
 # you would need to compare this to other volitilities to see if it is really good or bad, but it is the best we can do under the constraints
 
@@ -152,21 +166,6 @@ plt.plot()
 plt.savefig("Efficient_Frontier.png", bbox_inches='tight')
 plt.show()
 
-# Look at what the return and proportions are at the minimized risk
-min_risk = min(risks)
-index = risks.index(min_risk)
-return_at_min = returns[index]
-prop_at_min= props[index]
-
-# at a risk of 1.929 std (same as 3.72 var, the return is 0.212 or 21.2%)
-print("minimum risk (std)=",round(min_risk,3))
-print("return value at the minimum risk",round(return_at_min,3))
-print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_min[0],3))
-print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_min[1],3))
-print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_min[2],3))
-print("Proportion of RST (Ross Stores) Stock",round(prop_at_min[3],3))
-print("Proportion of TH (Target Hospitality) Stock",round(prop_at_min[4],3))
-
 
 # Look at what the return and proportions are at a specified risk
 
@@ -192,4 +191,3 @@ print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
 print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
 print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
 print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
-
