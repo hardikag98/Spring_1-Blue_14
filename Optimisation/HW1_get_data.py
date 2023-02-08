@@ -48,11 +48,34 @@ for i in Symbols:
         
 # data manipulation
 # create percent daily returns column
-# formula: ((close-open)/open)*100 = % return
-# using close but not sure if I should use adj close?
+# formula: ((close - prior day close)/prior day close)*100=%dailyreturn
 
+num_days=len(stock_final.loc[stock_final['Name']=='ROST'])
 
-stock_final['Percent Return'] = ((stock_final.Close-stock_final.Open)/stock_final.Open)*100
+# for each stock
+for s in Symbols:
+    i = Symbols.index(s) #numeric index of stock name
+    for n in range(num_days): #access each day individually
+        current = n 
+        prev_day = current - 1
+        
+        if prev_day >= 0:
+            #get close values for today and yesterday
+            current_close = stock_final.loc[stock_final.index[current]]['Close'][i]
+            prev_close = stock_final.loc[stock_final.index[prev_day]]['Close'][i]
+            #calculate percent return
+            per_return = ((current_close-prev_close)/prev_close)*100
+            #save value in original dataframe
+            stock_final.loc[((stock_final['Name'] == s) & (stock_final['Close'] == current_close)),'Percent Return'] = per_return
+        else:
+            #no return for the first day, these rows will be dropped later
+            stock_final.loc[stock_final.index[n], 'Percent Return'] = 0
+            n += 1 #step day forward
+            continue
+
+# Remove rows outside of date range
+row_idx=[stock_final.index[0]]
+stock_final = stock_final.drop(row_idx)
 
 # save dataframs as csv to reduce pull request traffic
 stock_final.to_csv("stocks_final.csv", index=True)
