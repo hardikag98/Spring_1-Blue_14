@@ -191,3 +191,74 @@ print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
 print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
 print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
 print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
+
+
+target = 3.0
+
+min_difference = float('inf')
+index = None
+for i, num in enumerate(risks):
+    diff = abs(num - target)
+    if diff < min_difference:
+        min_difference = diff
+        index = i
+
+risks_at_target = risks[index]
+return_at_target = returns[index]
+prop_at_target= props[index]
+
+print("target=",target)
+print("risk value closest to the target (std)=",round(risks_at_target,3))
+print("return value at the specified risk",round(return_at_target,3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_target[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
+print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
+print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
+
+
+target = 3.5
+
+min_difference = float('inf')
+index = None
+for i, num in enumerate(risks):
+    diff = abs(num - target)
+    if diff < min_difference:
+        min_difference = diff
+        index = i
+
+risks_at_target = risks[index]
+return_at_target = returns[index]
+prop_at_target= props[index]
+
+print("target=",target)
+print("risk value closest to the target (std)=",round(risks_at_target,3))
+print("return value at the specified risk",round(return_at_target,3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_target[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
+print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
+print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
+
+target = 5.23
+
+min_difference = float('inf')
+index = None
+for i, num in enumerate(risks):
+    diff = abs(num - target)
+    if diff < min_difference:
+        min_difference = diff
+        index = i
+
+risks_at_target = risks[index]
+return_at_target = returns[index]
+prop_at_target= props[index]
+
+print("target=",target)
+print("risk value closest to the target (std)=",round(risks_at_target,3))
+print("return value at the specified risk",round(return_at_target,3))
+print("Proportion of ASC (Ardmore Shipping Corp) Stock",round(prop_at_target[0],3))
+print("Proportion of GLNCY (Glencore Plc) Stock",round(prop_at_target[1],3))
+print("Proportion of PDD (Pinduoduo) Stock",round(prop_at_target[2],3))
+print("Proportion of RST (Ross Stores) Stock",round(prop_at_target[3],3))
+print("Proportion of TH (Target Hospitality) Stock",round(prop_at_target[4],3))
