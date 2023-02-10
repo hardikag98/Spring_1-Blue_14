@@ -7,23 +7,21 @@ Created on Thu Feb  2 13:58:58 2023
 # code to pull financial data from 
 # https://towardsdatascience.com/downloading-historical-stock-prices-in-python-93f85f059c1f
 
-# Jane testing push/pull
-
 # libraries
 import pandas as pd
 import yfinance as yf
 import datetime
 
 # set dates range 
-start = datetime.datetime(2022,1,20) # January 20, 2022
-end = datetime.datetime(2023,1,19) # January 19, 2023 - this way we have all data up until January 18 since end date is exclusive
+start = datetime.datetime(2022,1,19) # January 20, 2022 <-need to have day prior to calculate first percent daily return
+end = datetime.datetime(2023,1,19) # January 18, 2023 <-need extra day to be inclusive
 
 # list stocks to pull data
 # Ross Stores (RST), Pinduoduo (PDD), Target Hospitality (TH), 
 # Ardmore Shipping Corp (ASC), Glencore Plc (GLNCY)
 
 Symbols = ["ROST", "PDD", "TH", "ASC", "GLNCY"] # Ross Stores is actually ROST not RST
-
+ 
 # create empty dataframe
 stock_final = pd.DataFrame()
 # iterate over each symbol
@@ -63,10 +61,21 @@ for s in Symbols:
             #get close values for today and yesterday
             current_close = stock_final.loc[stock_final.index[current]]['Close'][i]
             prev_close = stock_final.loc[stock_final.index[prev_day]]['Close'][i]
+            
+            current_high = stock_final.loc[stock_final.index[current]]['High'][i]
+            current_low = stock_final.loc[stock_final.index[current]]['Low'][i]
+            current_adjclose = stock_final.loc[stock_final.index[current]]['Adj Close'][i]
+            current_vol = stock_final.loc[stock_final.index[current]]['Volume'][i]
             #calculate percent return
             per_return = ((current_close-prev_close)/prev_close)*100
             #save value in original dataframe
-            stock_final.loc[((stock_final['Name'] == s) & (stock_final['Close'] == current_close)),'Percent Return'] = per_return
+            #fix this to match to all columns 
+            stock_final.loc[((stock_final['Name'] == s) & 
+                             (stock_final['Close'] == current_close) &
+                             (stock_final['High'] == current_high) &
+                             (stock_final['Low'] == current_low) &
+                             (stock_final['Adj Close'] == current_adjclose) &
+                             (stock_final['Volume'] == current_vol)),'Percent Return'] = per_return
         else:
             #no return for the first day, these rows will be dropped later
             stock_final.loc[stock_final.index[n], 'Percent Return'] = 0
