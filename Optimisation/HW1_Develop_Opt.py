@@ -207,10 +207,10 @@ for i, num in enumerate(risks):
 x= [risks[p1_index],risks[p2_index],risks[p3_index]]
 y= [returns[p1_index]*100,returns[p2_index]*100,returns[p3_index]*100]
 markers = ['o', '*', 's']
-colors = ['red', 'green', 'blue']
+colors = ['blue', 'blue', 'blue']
 
 for i in range(3):
-    plt.scatter(x[i], y[i], s=100, c=colors[i], marker=markers[i], zorder=3)
+    plt.scatter(x[i], y[i], s=300, c=colors[i], marker=markers[i], zorder=3)
 
 plt.plot()
 plt.savefig("Efficient_Frontier.png", bbox_inches='tight')
