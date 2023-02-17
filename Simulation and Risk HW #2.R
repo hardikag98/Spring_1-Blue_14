@@ -148,7 +148,7 @@ NRI <- rnorm(n=1000000, mean=0.75, sd=0.02)
 total_barrel_cost <- NULL
 total_rev <- NULL
 sev_taxes <- NULL #JW added additional operating expense
-for(i in 1:years){
+for(i in 1:15){
   total_rev[[i]] <- oil_volume[[i]]*oil_value[[i]]*NRI
   total_barrel_cost[[i]] <- oil_volume[[i]]*operating_cost[[i]]
   sev_taxes[[i]] <- total_rev[[i]] * 0.046 # JW added additional operating expense
