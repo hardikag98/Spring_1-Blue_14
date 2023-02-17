@@ -135,6 +135,7 @@ for(i in 1:years){
 }
 
 
+
 #Barrel cost and profit
 total_cost_per_barrel <- NULL
 total_rev <- NULL
