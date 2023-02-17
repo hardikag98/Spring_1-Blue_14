@@ -138,7 +138,9 @@ for(i in 1:years){
 #Barrel cost and profit
 total_cost_per_barrel <- NULL
 total_rev <- NULL
+sev_taxes <- NULL #JW added additional operating expense
 for(i in 1:years){
   total_rev[[i]] <- oil_volume[[i]]*oil_value[[i]]
   total_cost_per_barrel[[i]] <- oil_volume[[i]]*operating_cost[[i]]
+  sev_taxes[[i]] <- total_rev[[i]] * 0.046 # JW added additional operating expense
 }
