@@ -22,7 +22,7 @@ years <- nrow(data)
 # Year 0 Costs #
 set.seed(17)
 leased_acres <- rnorm(n=1000000, mean=600, sd=50)
-leased_acres_cost <- 9600*leased_acres
+leased_acres_cost <- 960*leased_acres
 set.seed(17)
 seismic_sections <- rnorm(n=1000000, mean=3, sd=0.35)
 seismic_sections_cost <- 43000*seismic_sections
@@ -49,6 +49,11 @@ year_0_costs <- leased_acres_cost + seismic_sections_cost +
                 oil_prod_cost + team_cost
 hist(year_0_costs)
 quantile(year_0_costs)
+
+
+year_0_dry_costs <- leased_acres_cost + seismic_sections_cost + team_cost
+hist(year_0_dry_costs)
+quantile(year_0_dry_costs)
 
 
 #Year Costs
@@ -88,6 +93,7 @@ rod_id_corr <- t(rod_id_corr)
 all_sims <- cbind(destandardize(rod_id_corr[,1], year_start_rate),
                     destandardize(rod_id_corr[,2], rod))
 
+
 #Remaining years rate of decline simulations 
 #(Is same across years but not wells so incorrect?)
 
@@ -114,7 +120,7 @@ rod <- all_sims$V2
 
 oil_volume <- NULL
 #Calculating the volume for each year based on rate of decline
-for(i in 1:years){
+for(i in 1:15){
   year_end_rate <- (1-rod)*ysr
   oil_volume[[i]] <- 365*((year_end_rate+ysr)/2)
   ysr <- year_end_rate
@@ -124,7 +130,7 @@ for(i in 1:years){
 #Calculating Oil Value from long term forecasts
 oil_value <- NULL
 operating_cost <- NULL
-for(i in 1:years){
+for(i in 1:15){
   set.seed(17*i)
   oil_value[[i]] <- rtriangle(n=1000000, 
                              a=data$`Low Oil Price`[i],
@@ -135,13 +141,16 @@ for(i in 1:years){
 }
 
 
+#Net Revenue Interest
+NRI <- rnorm(n=1000000, mean=0.75, sd=0.02)
 
 #Barrel cost and profit
-total_cost_per_barrel <- NULL
+total_barrel_cost <- NULL
 total_rev <- NULL
 sev_taxes <- NULL #JW added additional operating expense
 for(i in 1:years){
-  total_rev[[i]] <- oil_volume[[i]]*oil_value[[i]]
-  total_cost_per_barrel[[i]] <- oil_volume[[i]]*operating_cost[[i]]
+  total_rev[[i]] <- oil_volume[[i]]*oil_value[[i]]*NRI
+  total_barrel_cost[[i]] <- oil_volume[[i]]*operating_cost[[i]]
   sev_taxes[[i]] <- total_rev[[i]] * 0.046 # JW added additional operating expense
 }
+
