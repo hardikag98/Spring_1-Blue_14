@@ -319,3 +319,9 @@ quantile(year_0_dry_costs, probs = c(0.01,0.05,0.25,0.5,0.95,0.99))
 quantile(profit, probs = c(0.01,0.05,0.25,0.5,0.95,0.99))
 mean(year_0_dry_costs)
 mean(profit)
+
+# Expected Shortfall
+worst_dry <- subset(year_0_dry_costs, year_0_dry_costs<776252.5) 
+es_dry <- mean(worst_dry)
+worst_wet <- subset(profit, profit<9641423)
+es_wet <- mean(worst_wet)
