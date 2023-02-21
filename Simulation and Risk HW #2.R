@@ -320,8 +320,37 @@ quantile(profit, probs = c(0.01,0.05,0.25,0.5,0.95,0.99))
 mean(year_0_dry_costs)
 mean(profit)
 
+#Evaluate negative NPV cases
+prof <- as.data.frame(profit)
+prof$id <- seq(1,1000000,1)
+prof_neg <- prof %>% filter(profit <= 0)
+726/10000
+
+
+#Exploring why is the worst case the worst case
+year_0_costs[836616]
+team_cost[836616]
+leased_acres[836616]
+seismic_sections[836616]
+n_23[836616]
+n23 <- as.data.frame(n_23)
+for(i in 1:15){
+  print(oil_value[[i]][836616])
+  print(oil_volume[[i]][836616])
+}
+ysr_df <- as.data.frame(all_sims$V1)
+ysr_df$`all_sims$V1`[836616]
+
+
 # Expected Shortfall
-worst_dry <- subset(year_0_dry_costs, year_0_dry_costs<776252.5) 
-es_dry <- mean(worst_dry)
-worst_wet <- subset(profit, profit<9641423)
-es_wet <- mean(worst_wet)
+y0dc <- as.data.frame(year_0_dry_costs)
+y0dc_1perc <- quantile(year_0_dry_costs, probs = c(0.99))[1]
+worst_dry <- y0dc %>% filter(year_0_dry_costs > y0dc_1perc)
+es_dry <- mean(worst_dry$year_0_dry_costs)
+es_dry
+
+
+wet_1perc <- quantile(profit,probs = c(0.01))[1]
+worst_wet <- prof %>% filter(profit < wet_1perc)
+es_wet <- mean(worst_wet$profit)
+es_wet
