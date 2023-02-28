@@ -9,6 +9,8 @@ library(triangle)
 library(ggplot2)
 library(truncnorm)
 library(scales)
+
+#start <- Sys.time()
 # read in data
 # cost per well of crude oil, natural gas, and dry well
 df <- read_excel("C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\Analysis_Data.xlsx", sheet = 2, skip = 2)
@@ -36,7 +38,7 @@ df_sub$change_avg <- rowMeans(df_sub[,5:7])
 ########## 2006 to 2023 ################################################################################################
 
 # simulate 6 years into the future, 2006 - 2012
-n = 1000 #number of simulations to run parameter
+n = 100 #number of simulations to run parameter
 set.seed(123)
 
 xbar = mean(norm_change)
@@ -80,10 +82,23 @@ sim_size <- n
 #### Phase 3 code
 # Hydrocarbons
 hydrocarbon <- rtruncnorm(sim_size, a=0, b=1, mean=.99, sd=.05)
+
+######### save distribution of hydrocarbon
+
+saveRDS(hydrocarbon, 
+        file = "C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\hydrocarbon.rds")
+
 #hist(hydrocarbon)
+
 
 # Reservoir
 reservoir <- rtruncnorm(sim_size, a=0, b=1, mean=.8, sd=.1)
+
+############# save distribution of reservoir
+
+saveRDS(reservoir, 
+        file = "C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\reservoir.rds")
+
 #hist(reservoir)
 
 # structure and seal
@@ -110,7 +125,7 @@ for (i in index(planned_wells)) { # iterate through the number of planned wells
   id_well <- i
   #print(id_well)
   for (j in 1:planned_wells[i]) {
-    producing = rbinom(1, 1, sample(prob_produce,j,replace=TRUE)) #replace to FALSE for full simulation
+    producing = rbinom(1, 1, sample(prob_produce,j,replace=FALSE)) #replace to FALSE for full simulation
     prod_wells[nrow(prod_wells) + 1,] = c(id_well, producing, 0)
   }
   # producing = sum(rbinom(j, 1, sample(prob_produce,j,replace=TRUE))) 
@@ -253,6 +268,11 @@ for (i in index(prod_wells)){
 dry_prod_wells <- prod_wells %>% group_by(well_ID) %>% summarise(prod = sum(producing), dry = length(producing) - sum(producing))
 
 
+########## save distribution of proportion of producing and dry wells
+saveRDS(dry_prod_wells, 
+        file = "C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\dry_prod_wells.rds")
+
+
 # distribution of proportion of wet wells
 hist(dry_prod_wells$prod / (dry_prod_wells$prod + dry_prod_wells$dry))
 
@@ -265,8 +285,14 @@ for (i in index(wells_var$cost_NPV)) {
 
 
 # now unpack into one big distribution (used to calculate VaR and CVaR)
-
 wells_dist <- unlist(wells_var$cost_NPV)
+
+
+######### save simulated data
+saveRDS(wells_dist, 
+        file = "C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\wells_dist.rds")
+
+# test = readRDS(file = "C:\\Users\\Justin\\OneDrive - North Carolina State University\\Documents\\NC State\\IAA R\\Data\\wells_dist.rds")
 
 hist(wells_dist)
 
@@ -282,6 +308,8 @@ dollar(VaR)
 # calc CVaR
 ES <- mean(wells_dist[wells_dist < VaR], na.rm=TRUE)
 dollar(ES)
+
+#print( Sys.time() - start )
 
 # ggplot() + 
 #   aes(profit) + 
