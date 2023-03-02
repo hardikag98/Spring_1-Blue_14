@@ -324,4 +324,3 @@ ES <- mean(wells_dist[wells_dist < VaR], na.rm=TRUE)
 dollar(ES)
 
 print( Sys.time() - start )
-
