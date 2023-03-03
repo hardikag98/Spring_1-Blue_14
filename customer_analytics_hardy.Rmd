@@ -1,0 +1,75 @@
+##----------------------------------------------------------------
+# IAA Power Curves
+# Aaron Baker (ambaker31991@gmail.com)
+##----------------------------------------------------------------
+
+rm(list = ls())
+
+require(pwr) #https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
+require(dplyr)
+require(ggplot2)
+require(scales)
+
+#--------------------------------------
+# Calculate minimum sample size
+#--------------------------------------
+
+rm(list = ls())
+
+# Estimates of the control parameters:
+p0 <- 0.0126 # This typically comes from the historical data
+daily_sample_amount <- 225 # This typically the average historical daily amount in the time period expecting to test
+
+#Set of minimum sample size parameters
+alpha <- 0.05 #the probability of a false positive
+beta <- 0.20 #the probability of a false negative
+power <- 1 - beta #the probability of a true positive
+mdl <- 0.005 # the minimum detectable lift to design test for. defined as the % difference
+smp_ratio <- 1 #equal sample size in each variant 
+direction <- 'two.sided' #type of test
+
+#Calculate the minimum sample size (proprotion) using pwr package
+min_n_pwr <- pwr.2p.test(n=NULL, #leaving this Null will return the minimum sample required
+                        h=ES.h(p1=p0,p2=p0+mdl), #Effect size (Cohen's h) - https://en.wikipedia.org/wiki/Cohen%27s_h
+                        sig.level=alpha, 
+                        power=power, 
+                        alternative="two.sided")
+
+plot(min_n_pwr) + 
+  geom_hline(yintercept=0.80, color='blue') + 
+  scale_x_continuous(labels = comma)
+
+#Create your own power curve
+parameters <- expand.grid(ALPHA=c(0.025,0.05,0.10), POWER=seq(from=0.50,to=0.99,by=0.01))
+parameters <- arrange(parameters, ALPHA)
+
+parameters <- parameters %>% 
+  rowwise() %>%
+  mutate(SAMPLE_SIZE=pwr.2p.test(n=NULL,
+                                 h=ES.h(p1=p0,p2=p0+mdl),
+                                 sig.level=ALPHA,
+                                 power=POWER,
+                                 alternative='two.sided')$n) %>%
+  mutate(DURATION_DAYS=SAMPLE_SIZE/daily_sample_amount) %>%
+  mutate(ALPHA=as.factor(ALPHA))
+
+#By Sample Size
+ggplot(data=parameters, aes(x=SAMPLE_SIZE, y=POWER, color=ALPHA)) +
+  geom_line() +
+  geom_hline(yintercept=0.80) + 
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = percent) +
+  labs(title="Power curve for varying levels of Alpha")
+
+#By Duration
+ggplot(data=parameters, aes(x=DURATION_DAYS, y=POWER, color=ALPHA)) +
+  geom_line() +
+  geom_hline(yintercept=0.80) + 
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = percent) +
+  labs(title="Power curve for varying levels of Alpha")
+
+
+
+
+
